@@ -13,32 +13,33 @@ public class PPbot extends PircBot
     final static int T_KEYWORD = 2;
     final static int T_VARIABLE = 3;
     final static int T_DELTA = 4;
+    final static int T_SILENT = 5;
 
     final String[][] triggers = {
-//  {string nick,       bool exact, string match,   string variable,                 int delta}
-    {"danyell",         "false",    "hah",          "danyell.says.hah",              "1"},
-    {"BungoDanderfluff","true",     "meow",         "meow",                          "1"},
-    {"xx3nvyxx",        "true",     "meow",         "meow",                          "1"},
-    {"jtb",             "false",    "show",         "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "show",         "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "shows",        "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "shows",        "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "concert",      "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "concert",      "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "concerts",     "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "concerts",     "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "gig",          "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "gig",          "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "gigs",         "jonthebastard.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "gigs",         "jonthebastard.mentions.a.show", "1"},
-    {"jtb",             "false",    "ticket",       "jonthebastard.almost.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "ticket",       "jonthebastard.almost.mentions.a.show", "1"},
-    {"jtb",             "false",    "tickets",      "jonthebastard.almost.mentions.a.show", "1"},
-    {"jonthebastard",   "false",    "tickets",      "jonthebastard.almost.mentions.a.show", "1"},
-    {"danyell",         "false",    "hah",          "danyell.says.hah",             "1"},
-    {"beatsake",        "false",    "hotpot",       "beatsake.mentions.hot.pot",    "1"},
-    {"beatsake",        "false",    "hot pot",      "beatsake.mentions.hot.pot",    "1"},
-    {"beatsake",        "false",    "hot.pot",      "beatsake.mentions.hot.pot",    "1"}};
+//  {string nick,       bool exact, string match,   string variable,                 int delta, bool silent}
+    {"danyell",         "false",    "hah",          "danyell.says.hah",              "1",       "false"},
+    {"BungoDanderfluff","true",     "meow",         "meow",                          "1",       "true"},
+    {"xx3nvyxx",        "true",     "meow",         "meow",                          "1",       "true"},
+    {"jtb",             "false",    "show",         "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "show",         "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "shows",        "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "shows",        "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "concert",      "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "concert",      "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "concerts",     "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "concerts",     "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "gig",          "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "gig",          "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "gigs",         "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "gigs",         "jonthebastard.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "ticket",       "jonthebastard.almost.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "ticket",       "jonthebastard.almost.mentions.a.show", "1",       "false"},
+    {"jtb",             "false",    "tickets",      "jonthebastard.almost.mentions.a.show", "1",       "false"},
+    {"jonthebastard",   "false",    "tickets",      "jonthebastard.almost.mentions.a.show", "1",       "false"},
+    {"danyell",         "false",    "hah",          "danyell.says.hah",             "1",       "false"},
+    {"beatsake",        "false",    "hotpot",       "beatsake.mentions.hot.pot",    "1",       "false"},
+    {"beatsake",        "false",    "hot pot",      "beatsake.mentions.hot.pot",    "1",       "false"},
+    {"beatsake",        "false",    "hot.pot",      "beatsake.mentions.hot.pot",    "1",       "false"}};
 
     final String MAGIC_RESPONSE_CATEGORY = "magic8ball";
     final String[] blacklistUsers = {"dongbot"};
@@ -191,7 +192,7 @@ public class PPbot extends PircBot
         applyMatch(getNick(), "#"+channel, sender, -1, false);
     }
 
-    public void applyMatch(String sender, String channel, String key, int delta, boolean checkExpiry)
+    public void applyMatch(String sender, String channel, String key, int delta, boolean checkExpiry, boolean silent = false)
     {
         for(int i = 0; i < blacklistKeys.length; i++)
         {
@@ -240,7 +241,8 @@ public class PPbot extends PircBot
         else
             values.put(key, new Integer(values.get(key).intValue() + delta));
 
-        displayValue(channel, sender, key);
+        if(!silent)
+            displayValue(channel, sender, key);
     }
 
     // returns true if keys is not a unique set
@@ -839,8 +841,15 @@ public class PPbot extends PircBot
             Matcher matcher = pattern.matcher(message.toLowerCase());
             if(matcher.find())
             {
-                local_sendMessage(channel, sender + ": " + triggers[i][T_VARIABLE] + "++");
-                applyMatch(getNick(), channel, triggers[i][T_VARIABLE], Integer.parseInt(triggers[i][T_DELTA]), false);
+                if(!Boolean.parseBoolean(triggers[i][T_SILENT]))
+                {
+                    local_sendMessage(channel, sender + ": " + triggers[i][T_VARIABLE] + "++");
+                    applyMatch(getNick(), channel, triggers[i][T_VARIABLE], Integer.parseInt(triggers[i][T_DELTA]), false);
+                }
+                else
+                {
+                    applyMatch(getNick(), channel, triggers[i][T_VARIABLE], Integer.parseInt(triggers[i][T_DELTA]), false, true)
+                }
             }
         }
 
